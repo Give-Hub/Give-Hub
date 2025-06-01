@@ -1,0 +1,216 @@
+html {
+    background:  #8eaac8;;
+}
+/* Reset some default browser styles */
+body, h2, form, input, textarea, button {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    margin: 10vh;
+    max-width: 31.25rem;
+    padding: 2.5rem;
+    background-color: #46709c; /* rgba(141, 174, 186, 0.864);  Semi-transparent white background */
+    border-radius: 0.5rem;
+    box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 1.25rem;
+    color: white;
+}
+
+.form-group {
+    font-weight: bold;
+    margin-bottom: 1.25rem;
+}
+
+select, option {
+    font-size: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.3125rem;
+    color: #ffffff;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 0.0625rem solid #ddd;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    background-color: #1f4772;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 2.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #163454;
+}
+
+#location {
+    display: flex;
+}
+
+#location-field{
+    resize: none;
+    min-width: 75%;
+    margin-right: 0.3125rem;
+}
+
+#get-location {
+    padding: 0.75rem 1.875rem; 
+}
+
+#form-status {
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+
+/* help button start */
+.help-button {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    background-color: #46709c;
+    border-radius: 0.625rem 0 0 0.625rem; 
+    padding: 0.3125rem 0;
+    box-shadow: 0 0 0.3125rem;  
+}
+
+.icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #46709c;
+    color: white;
+    cursor: pointer;
+    margin: 0.3125rem 0;
+    font-size: 1.25rem;
+}
+
+.icon:hover {
+    background-color: #487cb6;
+}
+
+.help-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.help-modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 1.25rem;
+    border: 0.0625rem solid #888;
+    width: 80%;
+    max-width: 25rem;
+    border-radius: 0.625rem;
+    text-align: center;
+}
+
+.help-close {
+    color: #aaa;
+    float: right;
+    font-size: 1.75rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.help-close:hover,
+.help-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+/* help button end */
+
+@media (max-width: 992px) {
+
+    #donation-container {
+        width: 100%;
+        margin: 5rem 2rem;
+    }
+
+    .form-group {
+        font-size: 1em !important;
+    }
+    .form-group input {
+        width: 90%;
+        padding: 2% 0;
+    }
+
+    #request-location {
+        width: 100% !important;
+        margin-right: 0;
+        margin-bottom: 0.625rem;
+        height: 2.25rem !important;
+        font-size: 0.875rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    #request-get-location {
+        height: 3.5rem !important;
+        width: 50% !important;
+        font-size: 0.875rem !important;
+        padding: 0.5rem 1rem !important;
+        margin-left: 0.2rem;
+        margin-top: 0;
+    }
+
+    #request-get-location p {
+        text-wrap: wrap;
+    }
+
+    form button {
+        width: 100%;
+        margin-top: 0.5rem;
+        height: 2.25rem
+    }
+
+    .icon {
+        height: 1.3rem;
+        width: 1.2rem;
+        font-size: 0.8rem;
+    }
+}
