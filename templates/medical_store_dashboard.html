@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Store Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body { padding-top: 20px; }
+        .container { max-width: 1200px; }
+        .card-header { font-weight: bold; }
+        .table-responsive { max-height: 500px; overflow-y: auto; }
+        .action-form { margin-bottom: 5px; } /* Added for spacing forms */
+        /* Specific styling for the forms within the table to make them compact */
+        .receipt-form .form-control {
+            margin-bottom: 5px; /* Small gap between input fields */
+            font-size: 0.85rem; /* Smaller font for compactness */
+            padding: 0.25rem 0.5rem; /* Smaller padding */
+        }
+        .receipt-form button {
+            width: 100%;
+            margin-top: 5px;
+        }
+        .receipt-form .input-group {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">GiveHub Medical Store</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Medical Store Dashboard</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Your Current Medicine Stock</h3>
+                <small class="text-muted">Overview of medicines available in your store, grouped by medicine name and expiry date.</small>
+            </div>
+            <div class="card-body table-responsive">
+                {% if stock_medicines %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Medicine Name</th>
+                            <th>Total Quantity</th>
+                            <th>Expiry Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for medicine in stock_medicines %}
+                        <tr>
+                            <td>{{ medicine.medicine_name }}</td>
+                            <td>{{ medicine.total_quantity }}</td>
+                            <td>{{ medicine.expiry_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>Your medical store currently has no medicines in stock.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Donations Assigned to Your Store (Pending Receipt)</h3>
+                <small class="text-muted">These donations are assigned to your store for physical receipt and addition to your stock. Please verify details and enter batch number/price.</small>
+            </div>
+            <div class="card-body table-responsive">
+                {% if assigned_donations %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Donation ID</th>
+                            <th>Donor Name</th>
+                            <th>Offered Medicine</th>
+                            <th>Offered Quantity</th>
+                            <th>Offered Expiry</th>
+                            <th>Image</th>
+                            <th>Donated At</th>
+                            <th>Confirm/Reject</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for donation in assigned_donations %}
+                        <tr>
+                            <td>{{ donation.id }}</td>
+                            <td>{{ donation.donor_name }}</td>
+                            <td>{{ donation.medicine_name }}</td>
+                            <td>{{ donation.quantity }}</td>
+                            <td>{{ donation.expiry_date | default('N/A') }}</td>
+                            <td>
+                                {% if donation.image_filename %}
+                                <a href="{{ url_for('uploaded_image', filename=donation.image_filename) }}" target="_blank">View Image</a>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ donation.created_at }}</td>
+                            <td>
+                                <form action="{{ url_for('medical_store_confirm_donation_receipt', donation_id=donation.id) }}" method="POST" class="receipt-form">
+                                    <input type="hidden" name="donation_id" value="{{ donation.id }}">
+
+                                    <input type="text" name="received_medicine_name" class="form-control" placeholder="Medicine Name" value="{{ donation.medicine_name }}" required>
+
+                                    <input type="text" name="batch_no" class="form-control" placeholder="Batch No" required>
+
+                                    <input type="number" name="received_quantity" class="form-control" placeholder="Received Quantity" value="{{ donation.quantity }}" required min="1">
+
+                                    <input type="number" step="0.01" name="unit_price" class="form-control" placeholder="Unit Price (Optional)">
+
+                                    <input type="date" name="expiry_date" class="form-control" value="{{ donation.expiry_date }}" required>
+
+                                    <button type="submit" class="btn btn-success btn-sm w-100 mb-1">Confirm Receipt & Add to Stock</button>
+                                </form>
+                                <form action="{{ url_for('medical_store_reject_donation', donation_id=donation.id) }}" method="POST" class="action-form">
+                                    <button type="submit" class="btn btn-danger btn-sm w-100">Reject Donation</button>
+                                </form>
+                                <a href="{{ url_for('medical_store_view_donation_details', donation_id=donation.id) }}" class="btn btn-info btn-sm w-100 mt-1 action-form">View Details</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No new donations assigned to your medical store.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Requests Assigned to Your Store (Pending Fulfillment)</h3>
+                <small class="text-muted">These requests from NGOs have been assigned to your store for fulfillment.</small>
+            </div>
+            <div class="card-body table-responsive">
+                {% if assigned_requests %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>NGO Name</th>
+                            <th>NGO Email</th>
+                            <th>Medicine Type</th>
+                            <th>Urgency</th>
+                            <th>Requested At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request_item in assigned_requests %}
+                        <tr>
+                            <td>{{ request_item.id }}</td>
+                            <td>{{ request_item.ngo_name }}</td>
+                            <td>{{ request_item.ngo_email }}</td>
+                            <td>{{ request_item.medicine_type }}</td>
+                            <td>{{ request_item.urgency_level }}</td>
+                            <td>{{ request_item.created_at }}</td>
+                            <td>
+                                <form action="{{ url_for('medical_store_fulfill_request', request_id=request_item.id) }}" method="POST" class="d-inline action-form">
+                                    <button type="submit" class="btn btn-primary btn-sm">Fulfill Request</button>
+                                </form>
+                                <a href="{{ url_for('medical_store_view_request_details', request_id=request_item.id) }}" class="btn btn-info btn-sm ms-1 action-form">View Details</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No requests currently assigned to your medical store for fulfillment.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

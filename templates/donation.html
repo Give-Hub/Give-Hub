@@ -1,0 +1,62 @@
+<!-- donation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donate Medicine</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-4">
+    <h2>Donate Medicines</h2>
+    <form action="{{ url_for('donation') }}" method="POST" enctype="multipart/form-data">
+      <!-- Donor Info -->
+      <div class="mb-3"><label>Your Name:</label><input type="text" class="form-control" name="donor_name" required></div>
+      <div class="mb-3"><label>Contact Number:</label><input type="tel" class="form-control" name="contact_number" required></div>
+      <div class="mb-3"><label>Email:</label><input type="email" class="form-control" name="email" required></div>
+      <div class="mb-3"><label>Pickup Address:</label><textarea name="address" class="form-control" required></textarea></div>
+      <div class="mb-3">
+        <label>Nearest Medical Store for Pickup:</label>
+        <select name="medical_store_id" class="form-select" required>
+          <option value="">Select</option>
+          {% for ms in medical_stores %}
+            <option value="{{ ms.id }}">{{ ms.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Multiple Medicines -->
+      <div class="mb-3">
+        <label>Number of Medicines to Donate:</label>
+        <input type="number" class="form-control" name="num_medicines" id="num_medicines" min="1" required>
+      </div>
+      <div id="medicine_fields"></div>
+
+      <button type="submit" class="btn btn-primary">Submit Donation</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('num_medicines').addEventListener('input', function() {
+      const count = parseInt(this.value);
+      const container = document.getElementById('medicine_fields');
+      container.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        container.innerHTML += `
+        <div class="border p-3 mb-3">
+          <h5>Medicine ${i + 1}</h5>
+          <label>Name:</label>
+          <input type="text" name="medicine_name_${i}" class="form-control" required>
+          <label>Quantity:</label>
+          <input type="number" name="quantity_${i}" class="form-control" min="1" required>
+          <label>Expiry Date:</label>
+          <input type="date" name="expiry_date_${i}" class="form-control" required>
+          <label>Image (optional):</label>
+          <input type="file" name="image_${i}" class="form-control" accept="image/*">
+        </div>`;
+      }
+    });
+  </script>
+</body>
+</html>

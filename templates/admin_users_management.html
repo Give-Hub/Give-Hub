@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - User Management - GiveHub</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <header>
+        <nav id="desktop-nav">
+            <ul>
+                <li><a href="{{ url_for('index') }}"><button>Home</button></a></li>
+                <li><a href="{{ url_for('admin_dashboard') }}"><button>Dashboard</button></a></li>
+                <li><a href="{{ url_for('admin_users_management') }}"><button>User Management</button></a></li>
+                {# Add more navigation links as needed #}
+            </ul>
+            <div class="nav-right-buttons">
+                <a href="{{ url_for('logout') }}"><button>Logout</button></a>
+            </div>
+        </nav>
+        <nav id="mobile-nav">
+            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul id="nav-menu">
+                <li><a href="{{ url_for('index') }}"><button><i class="fas fa-home"></i> Home</button></a></li>
+                <li><a href="{{ url_for('admin_dashboard') }}"><button><i class="fas fa-chart-line"></i> Dashboard</button></a></li>
+                <li><a href="{{ url_for('admin_users_management') }}"><button><i class="fas fa-users"></i> User Management</button></a></li>
+                <li class="mobile-auth-buttons">
+                    <a href="{{ url_for('logout') }}"><button><i class="fas fa-sign-out-alt"></i> Logout</button></a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="dashboard-main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="dashboard-section">
+            <div class="dashboard-header">
+                <h2>Admin User Management</h2>
+            </div>
+
+            {# Medical Store Approvals #}
+            <div class="dashboard-card full-width-card">
+                <h3>Medical Store Accounts (Approval/Action)</h3>
+                {% if medical_stores %}
+                    <div class="dashboard-table-container">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Contact</th>
+                                    <th>Address</th>
+                                    <th>Approved</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for store in medical_stores %}
+                                    <tr>
+                                        <td>{{ store.user_id }}</td>
+                                        <td>{{ store.name }}</td>
+                                        <td>{{ store.email }}</td>
+                                        <td>{{ store.contact_number }}</td>
+                                        <td>{{ store.address }}</td>
+                                        <td>
+                                            {% if store.approved %}
+                                                <span class="status-approved">Yes</span>
+                                            {% else %}
+                                                <span class="status-pending">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if not store.approved %}
+                                                <form action="{{ url_for('admin_user_action', role='Medical Store', user_id=store.user_id, action='approve') }}" method="POST" style="display:inline;">
+                                                    <button type="submit" class="action-button approve-button">Approve</button>
+                                                </form>
+                                                <form action="{{ url_for('admin_user_action', role='Medical Store', user_id=store.user_id, action='reject') }}" method="POST" style="display:inline;">
+                                                    <button type="submit" class="action-button reject-button">Reject</button>
+                                                </form>
+                                            {% else %}
+                                                {# Option to deactivate or edit if needed #}
+                                                Approved
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="no-data-message">No medical store accounts to display.</p>
+                {% endif %}
+            </div>
+
+            {# NGO Approvals #}
+            <div class="dashboard-card full-width-card">
+                <h3>NGO Accounts (Approval/Action)</h3>
+                {% if ngos %}
+                    <div class="dashboard-table-container">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Contact Person</th>
+                                    <th>Contact</th>
+                                    <th>Address</th>
+                                    <th>Reg. Number</th>
+                                    <th>Approved</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ngo in ngos %}
+                                    <tr>
+                                        <td>{{ ngo.user_id }}</td>
+                                        <td>{{ ngo.name }}</td>
+                                        <td>{{ ngo.email }}</td>
+                                        <td>{{ ngo.contact_person }}</td>
+                                        <td>{{ ngo.contact_number }}</td>
+                                        <td>{{ ngo.address }}</td>
+                                        <td>{{ ngo.registration_number }}</td>
+                                        <td>
+                                            {% if ngo.approved %}
+                                                <span class="status-approved">Yes</span>
+                                            {% else %}
+                                                <span class="status-pending">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if not ngo.approved %}
+                                                <form action="{{ url_for('admin_user_action', role='NGO', user_id=ngo.user_id, action='approve') }}" method="POST" style="display:inline;">
+                                                    <button type="submit" class="action-button approve-button">Approve</button>
+                                                </form>
+                                                <form action="{{ url_for('admin_user_action', role='NGO', user_id=ngo.user_id, action='reject') }}" method="POST" style="display:inline;">
+                                                    <button type="submit" class="action-button reject-button">Reject</button>
+                                                </form>
+                                            {% else %}
+                                                {# Option to deactivate or edit if needed #}
+                                                Approved
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="no-data-message">No NGO accounts to display.</p>
+                {% endif %}
+            </div>
+
+            {# Donor Accounts #}
+            <div class="dashboard-card full-width-card">
+                <h3>Donor Accounts</h3>
+                {% if donors %}
+                    <div class="dashboard-table-container">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Registered On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for donor in donors %}
+                                    <tr>
+                                        <td>{{ donor.id }}</td>
+                                        <td>{{ donor.name }}</td>
+                                        <td>{{ donor.email }}</td>
+                                        <td>{{ donor.created_at }}</td>
+                                        <td>
+                                            <form action="{{ url_for('admin_user_action', role='Donor', user_id=donor.id, action='deactivate') }}" method="POST" style="display:inline;">
+                                                <button type="submit" class="action-button reject-button" onclick="return confirm('Are you sure you want to delete this donor and all associated data? This action cannot be undone.');">Delete Donor</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="no-data-message">No donor accounts to display.</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        document.getElementById('mobile-nav-toggle').addEventListener('click', function() {
+            document.getElementById('nav-menu').classList.toggle('half-open');
+            this.classList.toggle('active');
+        });
+        function closeMobileNav() {
+            document.getElementById('nav-menu').classList.remove('half-open');
+            document.getElementById('nav-menu').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

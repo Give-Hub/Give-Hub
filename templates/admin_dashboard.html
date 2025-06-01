@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="MultipleFiles/styles.css"> <!-- Link to the provided CSS file -->
+    <style>
+        body {
+            background-color: #8eaac8; /* Background color from the CSS file */
+        }
+        .wrapper {
+            display: flex;
+            width: 100%;
+        }
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: #33577e; /* Sidebar background color from the CSS file */
+            color: #fff;
+            transition: all 0.3s;
+            position: fixed;
+            height: 100vh;
+            padding-top: 20px;
+        }
+        #sidebar.active {
+            margin-left: -250px;
+        }
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #2b6ba2; /* Header background color from the CSS file */
+            text-align: center;
+        }
+        #sidebar ul.components {
+            padding: 20px 0;
+            border-bottom: 1px solid #47748b;
+        }
+        #sidebar ul p {
+            color: #fff;
+            padding: 10px;
+        }
+        #sidebar ul li a {
+            padding: 10px;
+            font-size: 1.1em;
+            display: block;
+            color: #fff;
+        }
+        #sidebar ul li a:hover {
+            color: #7386D5;
+            background: #fff;
+        }
+        #content {
+            width: calc(100% - 250px);
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        #content.active {
+            width: 100%;
+        }
+        .navbar {
+            padding: 15px 10px;
+            background: #fff;
+            border: none;
+            border-radius: 0;
+            margin-bottom: 40px;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #33577e; /* Card header background color from the CSS file */
+            color: white;
+            font-weight: bold;
+        }
+        .table-responsive {
+            margin-top: 15px;
+        }
+        .table thead th {
+            background-color: #497db4; /* Table header background color from the CSS file */
+            color: white;
+        }
+        .btn-confirm {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+        .btn-confirm:hover {
+            background-color: #218838;
+        }
+        .btn-assign {
+            background-color: #33577e; /* Button color from the CSS file */
+            color: white;
+            border: none;
+        }
+        .btn-assign:hover {
+            background-color: #3e6898; /* Hover color from the CSS file */
+        }
+        .btn-view {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+        }
+        .btn-view:hover {
+            background-color: #138496;
+        }
+        .alert {
+            margin-top: 20px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">GiveHub Admin</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Admin Dashboard</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <a href="{{ url_for('add_ngo') }}" class="btn btn-success mb-3">Add New NGO</a>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Pending Medical Store Registrations</h3>
+            </div>
+            <div class="card-body table-responsive">
+                {% if pending_medical_stores %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Contact Person</th>
+                            <th>Address</th>
+                            <th>License Number</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for store in pending_medical_stores %}
+                        <tr>
+                            <td>{{ store.name }}</td>
+                            <td>{{ store.email }}</td>
+                            <td>{{ store.contact_person }}</td>
+                            <td>{{ store.address }}</td>
+                            <td>{{ store.license_number }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('admin_approve_medical_store', store_id=store.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm"
+                                            onclick="return confirm('Are you sure you want to approve this Medical Store?')">
+                                        Approve
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin_reject_medical_store', store_id=store.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure you want to reject this Medical Store?')">
+                                        Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No pending Medical Store registrations.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Pending NGO Registrations</h3>
+            </div>
+            <div class="card-body table-responsive">
+                {% if pending_ngos %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Contact Person</th>
+                            <th>Address</th>
+                            <th>Registration Number</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ngo in pending_ngos %}
+                        <tr>
+                            <td>{{ ngo.name }}</td>
+                            <td>{{ ngo.email }}</td>
+                            <td>{{ ngo.contact_person }}</td>
+                            <td>{{ ngo.address }}</td>
+                            <td>{{ ngo.registration_number }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('admin_approve_ngo', ngo_id=ngo.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm"
+                                            onclick="return confirm('Are you sure you want to approve this NGO?')">
+                                        Approve
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin_reject_ngo', ngo_id=ngo.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure you want to reject this NGO?')">
+                                        Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No pending NGO registrations.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>All Donations Overview</h3>
+            </div>
+            <div class="card-body table-responsive">
+                {% if all_donations %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Donor Name</th>
+                            <th>Medical Store</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for donation in all_donations %}
+                        <tr>
+                            <td>{{ donation.id }}</td>
+                            <td>{{ donation.donor_name }}</td>
+                            <td>{{ donation.medical_store_name if donation.medical_store_name else 'N/A' }}</td>
+                            <td>{{ donation.created_at }}</td>
+                            <td>
+                                <a href="{{ url_for('admin_view_donation_details', donation_id=donation.id) }}" class="btn btn-info btn-sm">View Details</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No donations found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>All NGO Requests Overview</h3>
+            </div>
+            <div class="card-body table-responsive">
+                {% if all_requests %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>NGO Name</th>
+                            <th>Status</th>
+                            <th>Requested At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in all_requests %}
+                        <tr>
+                            <td>{{ request.id }}</td>
+                            <td>{{ request.ngo_name }}</td>
+                            <td>
+                                <span class="badge {% if request.status == 'Pending' %}bg-warning{% elif request.status == 'Fulfilled' %}bg-success{% elif request.status == 'Rejected' %}bg-danger{% else %}bg-info{% endif %}">
+                                    {{ request.status }}
+                                </span>
+                            </td>
+                            <td>{{ request.created_at }}</td>
+                            <td>
+                                <a href="{{ url_for('admin_view_request_details', request_id=request.id) }}" class="btn btn-info btn-sm">View Details</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No NGO requests found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+                $('#content').toggleClass('active');
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

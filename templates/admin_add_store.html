@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Medical Store</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Add Medical Store</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('add_store') }}">
+        <div class="form-group">
+            <label for="name">Store Name</label>
+            <input type="text" class="form-control" name="name" id="name" placeholder="Enter store name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Store Email</label>
+            <input type="email" class="form-control" name="email" id="email" placeholder="Enter store email" required>
+        </div>
+        <div class="form-group">
+            <label for="contact">Contact Number</label>
+            <input type="text" class="form-control" name="contact" id="contact" placeholder="Enter contact number" required>
+        </div>
+        <div class="form-group">
+            <label for="address">Store Address</label>
+            <textarea class="form-control" name="address" id="address" rows="3" placeholder="Enter address" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="password">Store Password</label>
+            <input type="password" class="form-control" name="password" id="password" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Store</button>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary ml-2">Back to Dashboard</a>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

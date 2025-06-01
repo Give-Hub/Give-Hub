@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Details - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body { padding-top: 20px; }
+        .container { max-width: 800px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">GiveHub Admin</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Request Details (ID: {{ request_data.id }})</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if request_data %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    Request Information
+                </div>
+                <div class="card-body">
+                    <p><strong>Requester NGO:</strong> {{ request_data.ngo_name }} ({{ request_data.ngo_email }})</p>
+                    <p><strong>Request Status:</strong>
+                        <span class="badge {% if request_data.status == 'Pending' %}bg-warning{% elif request_data.status == 'Fulfilled' %}bg-success{% elif request_data.status == 'Rejected' %}bg-danger{% else %}bg-info{% endif %}">
+                            {{ request_data.status }}
+                        </span>
+                    </p>
+                    <p><strong>Requested At:</strong> {{ request_data.created_at }}</p>
+                    <p><strong>Assigned Medical Store:</strong> {{ request_data.medical_store_name if request_data.medical_store_name else 'N/A' }}</p>
+                    <p><strong>Required By Date:</strong> {{ request_data.required_by_date }}</p>
+                    <p><strong>Purpose:</strong> {{ request_data.purpose }}</p>
+                    <p><strong>Delivery Address:</strong> {{ request_data.delivery_address }}</p>
+                    <p><strong>Contact Person:</strong> {{ request_data.contact_person }}</p>
+                    <p><strong>Contact Number:</strong> {{ request_data.contact_number }}</p>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    Requested Medicines
+                </div>
+                <div class="card-body">
+                    {% if medicines %}
+                        <ul class="list-group">
+                            {% for medicine in medicines %}
+                                <li class="list-group-item">
+                                    <strong>{{ medicine.medicine_name }}</strong> - {{ medicine.quantity }} units
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No specific medicine details found for this request.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    Beneficiaries
+                </div>
+                <div class="card-body">
+                    {% if beneficiaries %}
+                        <ul class="list-group">
+                            {% for beneficiary in beneficiaries %}
+                                <li class="list-group-item">
+                                    <strong>Gender:</strong> {{ beneficiary.gender }},
+                                    <strong>Age Group:</strong> {{ beneficiary.age_group }},
+                                    <strong>Condition:</strong> {{ beneficiary.medical_condition if beneficiary.medical_condition else 'N/A' }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No beneficiary details found for this request.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% else %}
+            <p class="alert alert-warning">Request details not found.</p>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

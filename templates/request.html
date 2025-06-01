@@ -1,0 +1,80 @@
+<!-- request.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Request Medicines</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-4">
+    <h2>Request Medicines (NGO)</h2>
+    <form action="{{ url_for('request_medicine') }}" method="POST" enctype="multipart/form-data">
+      <!-- Requested Medicines -->
+      <div class="mb-3">
+        <label>Number of Medicines Needed:</label>
+        <input type="number" name="num_medicines" id="num_medicines" min="1" class="form-control" required>
+      </div>
+      <div id="requested_medicines"></div>
+
+      <!-- Beneficiaries -->
+      <div class="mb-3">
+        <label>Number of Beneficiaries:</label>
+        <input type="number" name="num_beneficiaries" id="num_beneficiaries" min="1" class="form-control" required>
+      </div>
+      <div id="beneficiary_fields"></div>
+
+      <!-- Requester Info -->
+      <div class="mb-3"><label>Your Name:</label><input type="text" name="name" class="form-control" required></div>
+      <div class="mb-3"><label>Contact Number:</label><input type="tel" name="contactNumber" class="form-control"></div>
+      <div class="mb-3"><label>Delivery Address:</label><textarea name="location" class="form-control" required></textarea></div>
+
+      <button type="submit" class="btn btn-primary">Submit Request</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('num_medicines').addEventListener('input', function() {
+      const n = parseInt(this.value);
+      const container = document.getElementById('requested_medicines');
+      container.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        container.innerHTML += `
+        <div class="border p-3 mb-3">
+          <h5>Requested Medicine ${i+1}</h5>
+          <label>Name:</label>
+          <input type="text" name="request_medicine_name_${i}" class="form-control" required>
+          <label>Quantity:</label>
+          <input type="number" name="request_quantity_${i}" class="form-control" required>
+        </div>`;
+      }
+    });
+
+    document.getElementById('num_beneficiaries').addEventListener('input', function() {
+      const n = parseInt(this.value);
+      const container = document.getElementById('beneficiary_fields');
+      container.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        container.innerHTML += `
+        <div class="border p-3 mb-3">
+          <h5>Beneficiary ${i+1}</h5>
+          <label>Name:</label>
+          <input type="text" name="beneficiary_name_${i}" class="form-control" required>
+          <label>Age:</label>
+          <input type="number" name="beneficiary_age_${i}" class="form-control" min="1" required>
+          <label>Sex:</label>
+          <select name="beneficiary_sex_${i}" class="form-select" required>
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <label>Doctor's Prescription (PDF):</label>
+          <input type="file" name="doctor_letter_${i}" class="form-control" accept=".pdf" required>
+        </div>`;
+      }
+    });
+  </script>
+</body>
+</html>

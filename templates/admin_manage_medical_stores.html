@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Medical Stores - Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <style>
+        /* Add specific styles for this page if needed, or rely on main style.css */
+        .dashboard-container {
+            width: 90%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #4a3f84;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        h3 {
+            color: #5a3678;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .actions button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s ease;
+            margin-right: 5px;
+        }
+        .approve-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .approve-btn:hover {
+            background-color: #218838;
+        }
+        .reject-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .reject-btn:hover {
+            background-color: #c82333;
+        }
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    {% include 'admin_header.html' %} {# Assuming you have an admin header with navigation #}
+
+    <div class="dashboard-container">
+        <h2>Manage Medical Store Applications</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes" style="list-style-type: none; padding: 0;">
+                    {% for category, message in messages %}
+                        <li class="alert alert-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <h3>Pending Applications</h3>
+        {% if pending_medical_stores %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Registered At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for store in pending_medical_stores %}
+                <tr>
+                    <td>{{ store.id }}</td>
+                    <td>{{ store.name }}</td>
+                    <td>{{ store.email }}</td>
+                    <td>{{ store.contact_number }}</td>
+                    <td>{{ store.address }}</td>
+                    <td>{{ store.registered_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="actions">
+                        <form action="{{ url_for('approve_medical_store', medical_store_id=store.id) }}" method="POST" style="display: inline;">
+                            <button type="submit" class="approve-btn">Approve</button>
+                        </form>
+                        <form action="{{ url_for('reject_medical_store', medical_store_id=store.id) }}" method="POST" style="display: inline;">
+                            <button type="submit" class="reject-btn" onclick="return confirm('Are you sure you want to reject this medical store application? This will delete the account.');">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-data">No pending medical store applications.</p>
+        {% endif %}
+
+        <h3>Approved Medical Stores</h3>
+        {% if approved_medical_stores %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Approved At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for store in approved_medical_stores %}
+                <tr>
+                    <td>{{ store.id }}</td>
+                    <td>{{ store.name }}</td>
+                    <td>{{ store.email }}</td>
+                    <td>{{ store.contact_number }}</td>
+                    <td>{{ store.address }}</td>
+                    <td>{{ store.registered_at.strftime('%Y-%m-%d %H:%M') }}</td> {# Assuming registered_at is when it was added/approved #}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-data">No approved medical stores.</p>
+        {% endif %}
+    </div>
+
+    {# Include your footer if you have one #}
+</body>
+</html>

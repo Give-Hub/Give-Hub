@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation Details - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body { padding-top: 20px; }
+        .container { max-width: 800px; }
+        .card-header { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">GiveHub Admin</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="mb-4">Donation Details (ID: {{ donation.id }})</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if donation %}
+        <div class="card mb-4">
+            <div class="card-header">
+                Donation Information
+            </div>
+            <div class="card-body">
+                <p><strong>Donor Name:</strong> {{ donation.donor_name }}</p>
+                <p><strong>Donor Email:</strong> {{ donation.donor_email }}</p>
+                <p><strong>Donor Contact:</strong> {{ donation.contact_number }}</p>
+                <p><strong>Address:</strong> {{ donation.address }}</p>
+                <p><strong>Pincode:</strong> {{ donation.pincode }}</p>
+                <p><strong>Pickup Date:</strong> {{ donation.pickup_date }}</p>
+                <p><strong>Pickup Time:</strong> {{ donation.pickup_time }}</p>
+                <p><strong>Created At:</strong> {{ donation.created_at }}</p>
+                <p><strong>Assigned Medical Store:</strong> {{ donation.medical_store_name if donation.medical_store_name else 'Not Assigned' }}</p>
+                {% if donation.medical_store_name %}
+                    <p><strong>Medical Store Contact:</strong> {{ donation.ms_contact }}</p>
+                    <p><strong>Medical Store Address:</strong> {{ donation.ms_address }}</p>
+                {% endif %}
+                <p><strong>Status:</strong>
+                    <span class="badge {% if donation.overall_status == 'Pending' %}bg-warning{% elif donation.overall_status == 'Approved' %}bg-success{% elif donation.overall_status == 'Collected' %}bg-primary{% elif donation.overall_status == 'Distributed' %}bg-info{% elif donation.overall_status == 'Rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
+                        {{ donation.overall_status }}
+                    </span>
+                </p>
+                {% if donation.image_filename %}
+                    <p><strong>Donation Image:</strong> <a href="{{ url_for('static', filename='uploads/' + donation.image_filename) }}" target="_blank">View Image</a></p>
+                {% else %}
+                    <p><strong>Donation Image:</strong> No Image Provided</p>
+                {% endif %}
+
+                {% if donation.certificate_sent %}
+                    <p><strong>Donation Certificate:</strong> <a href="{{ url_for('static', filename='certificates/' + donation.certificate_path) }}" target="_blank" class="btn btn-sm btn-info">View Certificate</a></p>
+                {% else %}
+                    <p><strong>Donation Certificate:</strong> Not Yet Sent</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Medicines in this Donation
+            </div>
+            <div class="card-body">
+                {% if medicines %}
+                <ul class="list-group">
+                    {% for medicine in medicines %}
+                    <li class="list-group-item">
+                        <strong>{{ medicine.medicine_name }}</strong> - Quantity: {{ medicine.quantity }} units (Expiry: {{ medicine.expiry_date }})
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No medicine details available for this donation.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+
+        {% else %}
+        <div class="alert alert-warning" role="alert">
+            Donation details could not be loaded.
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
